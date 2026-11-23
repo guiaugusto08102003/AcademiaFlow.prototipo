@@ -1,0 +1,2219 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0a">
+<meta name="description" content="AcademiaFlow - Gestão inteligente para academias. Fichas de treino, controle de acesso, cobrança recorrente e dashboard.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AcademiaFlow">
+<title>AcademiaFlow - Gestão Inteligente para Academias</title>
+<link rel="icon" type="image/svg+xml" href="/icon.svg">
+<link rel="apple-touch-icon" href="/icon.svg">
+<link rel="manifest" href="/manifest.json">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.0/index.css">
+<style>
+  * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; overscroll-behavior: none; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: #0a0a0a;
+    color: #fff;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+  @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 15px rgba(191,255,0,0.3); } 50% { box-shadow: 0 0 30px rgba(191,255,0,0.6); } }
+  @keyframes dropdownIn { from { opacity: 0; transform: translateY(-8px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+  @keyframes overlayIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes toastIn { from { opacity: 0; transform: translate(-50%, -20px); } to { opacity: 1; transform: translate(-50%, 0); } }
+
+  .animate-slide-up { animation: slideUp 0.4s ease-out both; }
+  .animate-fade-in { animation: fadeIn 0.3s ease-out both; }
+  .pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+  .animate-dropdown { animation: dropdownIn 0.2s ease-out both; }
+  .animate-overlay { animation: overlayIn 0.15s ease-out both; }
+  .animate-toast { animation: toastIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+  .gradient-text {
+    background: linear-gradient(135deg, #BFFF00 0%, #88cc00 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .glass {
+    background: rgba(26, 26, 26, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.07);
+  }
+
+  .card-hover { transition: transform 0.15s ease, border-color 0.2s ease; }
+  .card-hover:hover { border-color: rgba(191,255,0,0.25); }
+  .card-hover:active { transform: scale(0.98); }
+
+  .bg-grid {
+    background-image:
+      linear-gradient(rgba(191,255,0,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(191,255,0,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .hero-gradient {
+    background:
+      radial-gradient(ellipse at top, rgba(191,255,0,0.15) 0%, transparent 50%),
+      radial-gradient(ellipse at bottom right, rgba(191,255,0,0.08) 0%, transparent 50%),
+      #0a0a0a;
+  }
+
+  input, textarea, select {
+    background: #161616;
+    border: 1px solid #2a2a2a;
+    color: #fff;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: #BFFF00;
+    box-shadow: 0 0 0 3px rgba(191,255,0,0.12);
+  }
+
+  .tab-active { color: #BFFF00 !important; }
+  .tab-active::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #BFFF00;
+  }
+
+  .tab-btn { position: relative; }
+
+  .safe-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .safe-top { padding-top: env(safe-area-inset-top, 0px); }
+
+  button { font-family: inherit; cursor: pointer; }
+
+  .menu-item { transition: background 0.15s ease; }
+  .menu-item:hover { background: rgba(255,255,255,0.05); }
+  .menu-item:active { background: rgba(255,255,255,0.09); }
+
+  .avatar-btn { transition: all 0.2s ease; position: relative; }
+  .avatar-btn:hover { transform: scale(1.05); }
+  .avatar-btn.active { box-shadow: 0 0 0 2px #BFFF00; }
+
+  /* Desktop app shell feel */
+  @media (min-width: 640px) {
+    body {
+      background: #050505;
+      background-image: radial-gradient(circle at 50% 0%, rgba(191,255,0,0.06) 0%, transparent 60%);
+    }
+    .app-shell {
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+      background: #0a0a0a;
+      border-left: 1px solid rgba(255,255,255,0.06);
+      border-right: 1px solid rgba(255,255,255,0.06);
+      box-shadow: 0 0 60px rgba(0,0,0,0.8);
+      position: relative;
+    }
+    .fixed-shell-bar {
+      max-width: 478px;
+      margin: 0 auto;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div id="toast-container"></div>
+<div id="modal-container"></div>
+<div id="app" class="app-shell"></div>
+
+<script>
+// ============ DEFAULT DATA ============
+const DEFAULT_DATA = {
+  tenants: [{
+    id: 't1',
+    name: 'Iron Gym',
+    plan_status: 'active',
+    gateway_config: { provider: 'stripe' },
+    gate_api_config: { endpoint: 'https://gate.irongym.com' },
+    whatsapp_config: { provider: 'z-api' }
+  }],
+  users: [
+    { id: 'u1', tenant_id: 't1', role: 'ADMIN', name: 'Ricardo Alves', phone: '+5511999990001', email: 'admin@irongym.com', access_status: 'ACTIVE' },
+    { id: 'u2', tenant_id: 't1', role: 'TRAINER', name: 'Juliana Costa', phone: '+5511999990002', email: 'trainer@irongym.com', access_status: 'ACTIVE' },
+    { id: 'u3', tenant_id: 't1', role: 'STUDENT', name: 'Pedro Henrique', phone: '+5511999990003', email: 'pedro@email.com', access_status: 'ACTIVE' },
+    { id: 'u4', tenant_id: 't1', role: 'STUDENT', name: 'Mariana Silva', phone: '+5511999990004', email: 'mariana@email.com', access_status: 'ACTIVE' },
+    { id: 'u5', tenant_id: 't1', role: 'STUDENT', name: 'Lucas Ferreira', phone: '+5511999990005', email: 'lucas@email.com', access_status: 'BLOCKED' },
+    { id: 'u6', tenant_id: 't1', role: 'STUDENT', name: 'Camila Rocha', phone: '+5511999990006', email: 'camila@email.com', access_status: 'ACTIVE' },
+    { id: 'u7', tenant_id: 't1', role: 'STUDENT', name: 'Bruno Santos', phone: '+5511999990007', email: 'bruno@email.com', access_status: 'ACTIVE' }
+  ],
+  subscriptions: [
+    { id: 's1', tenant_id: 't1', user_id: 'u3', status: 'active', due_date: '2026-12-05', amount: 99.90 },
+    { id: 's2', tenant_id: 't1', user_id: 'u4', status: 'active', due_date: '2026-11-28', amount: 99.90 },
+    { id: 's3', tenant_id: 't1', user_id: 'u5', status: 'overdue', due_date: '2026-11-10', amount: 99.90 },
+    { id: 's4', tenant_id: 't1', user_id: 'u6', status: 'active', due_date: '2026-12-15', amount: 99.90 },
+    { id: 's5', tenant_id: 't1', user_id: 'u7', status: 'active', due_date: '2026-12-20', amount: 99.90 }
+  ],
+  workouts: [
+    {
+      id: 'w1', tenant_id: 't1', student_id: 'u3', trainer_id: 'u2',
+      title: 'Treino A - Peito e Tríceps',
+      exercises_json: [
+        { name: 'Supino Reto com Barra', sets: 4, reps: '10-12', load: '60kg', rest: '60s', notes: 'Controle a descida' },
+        { name: 'Supino Inclinado Halteres', sets: 3, reps: '10-12', load: '20kg', rest: '60s', notes: '' },
+        { name: 'Crucifixo Máquina', sets: 3, reps: '12-15', load: '30kg', rest: '45s', notes: 'Pico de contração 1s' },
+        { name: 'Tríceps Pulley Corda', sets: 4, reps: '12-15', load: '25kg', rest: '45s', notes: '' },
+        { name: 'Tríceps Francês', sets: 3, reps: '10-12', load: '12kg', rest: '60s', notes: '' }
+      ],
+      updated_at: '2026-11-20'
+    },
+    {
+      id: 'w2', tenant_id: 't1', student_id: 'u4', trainer_id: 'u2',
+      title: 'Treino A - Inferiores',
+      exercises_json: [
+        { name: 'Agachamento Livre', sets: 4, reps: '10', load: '50kg', rest: '90s', notes: 'Profundidade paralela' },
+        { name: 'Leg Press 45°', sets: 4, reps: '12', load: '120kg', rest: '75s', notes: '' },
+        { name: 'Cadeira Extensora', sets: 3, reps: '15', load: '40kg', rest: '45s', notes: '' },
+        { name: 'Stiff', sets: 3, reps: '12', load: '30kg', rest: '60s', notes: '' },
+        { name: 'Panturrilha em pé', sets: 4, reps: '20', load: '60kg', rest: '30s', notes: '' }
+      ],
+      updated_at: '2026-11-18'
+    },
+    {
+      id: 'w3', tenant_id: 't1', student_id: 'u6', trainer_id: 'u2',
+      title: 'Treino B - Costas e Bíceps',
+      exercises_json: [
+        { name: 'Puxada Frontal', sets: 4, reps: '10-12', load: '45kg', rest: '60s', notes: '' },
+        { name: 'Remada Curvada', sets: 4, reps: '10', load: '30kg', rest: '75s', notes: '' },
+        { name: 'Rosca Direta', sets: 3, reps: '12', load: '15kg', rest: '45s', notes: '' },
+        { name: 'Rosca Martelo', sets: 3, reps: '12', load: '12kg', rest: '45s', notes: '' }
+      ],
+      updated_at: '2026-11-15'
+    }
+  ],
+  access_logs: [
+    { id: 'a1', tenant_id: 't1', user_id: 'u3', method: 'QR', status: 'GRANTED', timestamp: '2026-11-23T08:15:00' },
+    { id: 'a2', tenant_id: 't1', user_id: 'u4', method: 'QR', status: 'GRANTED', timestamp: '2026-11-23T08:22:00' },
+    { id: 'a3', tenant_id: 't1', user_id: 'u5', method: 'QR', status: 'DENIED', timestamp: '2026-11-23T08:30:00' },
+    { id: 'a4', tenant_id: 't1', user_id: 'u6', method: 'QR', status: 'GRANTED', timestamp: '2026-11-23T09:05:00' },
+    { id: 'a5', tenant_id: 't1', user_id: 'u7', method: 'FACE', status: 'GRANTED', timestamp: '2026-11-23T09:12:00' }
+  ],
+  completed_sets: {},
+  workout_history: {}
+};
+
+// ============ STATE ============
+const state = {
+  currentView: 'login',
+  authTab: 'login', // 'login' | 'register'
+  user: null,
+  activeTab: 'home',
+  studentSearch: '',
+  studentFilter: 'ALL', // 'ALL' | 'ACTIVE' | 'BLOCKED'
+  selectedStudent: null,
+  editingWorkout: null,
+  showUserMenu: false,
+  modal: null, // { type: 'profile' | 'add-student' | 'confirm-logout' }
+  restTimer: { active: false, seconds: 0, total: 60 },
+  qrSeed: Date.now(),
+  deferredInstallPrompt: null,
+  data: JSON.parse(JSON.stringify(DEFAULT_DATA))
+};
+
+// Load full state from localStorage
+try {
+  const saved = localStorage.getItem('academiaflow_v2_data');
+  if (saved) {
+    const parsed = JSON.parse(saved);
+    state.data = { ...JSON.parse(JSON.stringify(DEFAULT_DATA)), ...parsed };
+  }
+  const savedUser = localStorage.getItem('academiaflow_v2_user');
+  if (savedUser) {
+    const u = JSON.parse(savedUser);
+    const freshUser = state.data.users.find(x => x.id === u.id) || u;
+    state.user = freshUser;
+    state.currentView = 'dashboard';
+  }
+} catch(e) { console.error('Load error:', e); }
+
+function saveData() {
+  try {
+    localStorage.setItem('academiaflow_v2_data', JSON.stringify(state.data));
+  } catch(e) {}
+}
+
+function saveUser() {
+  try {
+    if (state.user) localStorage.setItem('academiaflow_v2_user', JSON.stringify(state.user));
+    else localStorage.removeItem('academiaflow_v2_user');
+  } catch(e) {}
+}
+
+// ============ TOAST NOTIFICATION ============
+let toastTimeout = null;
+function showToast(message, type = 'success') {
+  const container = document.getElementById('toast-container');
+  if (!container) return;
+  const colors = {
+    success: 'border-[#BFFF00]/40 text-[#BFFF00]',
+    error: 'border-red-500/40 text-red-400',
+    info: 'border-blue-400/40 text-blue-300'
+  };
+  const icon = type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ';
+  container.innerHTML = `
+    <div class="fixed top-5 left-1/2 -translate-x-1/2 z-[100] glass px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-2.5 text-xs font-semibold animate-toast border ${colors[type] || colors.success}" style="max-width:90vw">
+      <span class="w-5 h-5 rounded-full flex items-center justify-center bg-white/10 font-bold">${icon}</span>
+      <span class="text-white">${message}</span>
+    </div>
+  `;
+  if (toastTimeout) clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => {
+    container.innerHTML = '';
+  }, 3000);
+}
+
+// ============ ICONS ============
+const icons = {
+  logo: `<svg viewBox="0 0 100 100" class="w-full h-full"><rect width="100" height="100" rx="20" fill="#0a0a0a"/><path d="M25 50 L40 35 L55 50 L70 35 L85 50" stroke="#BFFF00" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="25" cy="50" r="6" fill="#BFFF00"/><circle cx="85" cy="50" r="6" fill="#BFFF00"/></svg>`,
+  home: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-6 h-6"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`,
+  users: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-6 h-6"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>`,
+  dumbbell: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-6 h-6"><path d="M6 4v16M18 4v16M6 12h12M2 8v8M22 8v8"/></svg>`,
+  qr: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-6 h-6"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM20 14v3M14 20h3M20 20v.01"/></svg>`,
+  settings: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-6 h-6"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>`,
+  logout: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>`,
+  switchUser: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>`,
+  user: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+  check: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="w-4 h-4"><polyline points="20 6 9 17 4 12"/></svg>`,
+  plus: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="w-5 h-5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
+  arrow: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><polyline points="15 18 9 12 15 6"/></svg>`,
+  arrowRight: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><polyline points="9 18 15 12 9 6"/></svg>`,
+  bell: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>`,
+  whatsapp: `<svg viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.8.9-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.4.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5-.1-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1.1 2.8 1.2 3c.1.2 2.1 3.3 5.2 4.6.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3zM12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.5 1.3 5L2 22l5.2-1.4c1.4.8 3.1 1.2 4.8 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2z"/></svg>`,
+  clock: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
+  lock: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>`,
+  unlock: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 019.9-1"/></svg>`,
+  dollar: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>`,
+  x: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
+  trash: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>`,
+  edit: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`,
+  zap: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
+  shield: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-6 h-6"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
+  mail: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>`,
+  search: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>`,
+  refresh: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>`,
+  download: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`
+};
+
+// ============ RENDER ============
+function render() {
+  try {
+    const app = document.getElementById('app');
+    if (!app) return;
+    switch(state.currentView) {
+      case 'login': app.innerHTML = renderLogin(); break;
+      case 'dashboard': app.innerHTML = renderDashboard(); break;
+      case 'workout': app.innerHTML = renderWorkoutView(); break;
+      case 'workout-mode': app.innerHTML = renderWorkoutMode(); break;
+      default: app.innerHTML = renderLogin();
+    }
+    renderModal();
+    attachEvents();
+  } catch(e) {
+    console.error('Render error:', e);
+    document.getElementById('app').innerHTML = `<div style="padding:20px;color:red">Erro: ${e.message}</div>`;
+  }
+}
+
+// ============ MODALS ============
+function renderModal() {
+  const container = document.getElementById('modal-container');
+  if (!container) return;
+  if (!state.modal) {
+    container.innerHTML = '';
+    return;
+  }
+
+  if (state.modal.type === 'profile') {
+    const u = state.user;
+    const roleLabels = { ADMIN: 'Administrador', TRAINER: 'Professor', STUDENT: 'Aluno' };
+    container.innerHTML = `
+      <div id="modal-backdrop" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-4 animate-overlay">
+        <div class="glass w-full max-w-md rounded-3xl p-6 animate-slide-up border border-white/10" onclick="event.stopPropagation()">
+          <div class="flex items-center justify-between mb-5">
+            <h3 class="text-lg font-bold">Meu Perfil</h3>
+            <button id="close-modal" class="p-2 rounded-xl hover:bg-white/5">${icons.x}</button>
+          </div>
+          <div class="flex items-center gap-4 mb-6 p-4 rounded-2xl bg-white/[0.03]">
+            <div class="w-14 h-14 rounded-2xl flex items-center justify-center font-bold text-xl" style="background:linear-gradient(135deg,#BFFF00,#4d7a00);color:#0a0a0a">
+              ${u.name.charAt(0)}
+            </div>
+            <div>
+              <div class="font-bold text-base">${u.name}</div>
+              <div class="text-xs text-[#BFFF00] font-semibold mt-0.5">${roleLabels[u.role]} • Iron Gym</div>
+            </div>
+          </div>
+          <div class="space-y-3 text-sm mb-6">
+            <div class="flex justify-between py-2.5 border-b border-white/5">
+              <span class="text-gray-500">E-mail</span>
+              <span class="font-medium">${u.email}</span>
+            </div>
+            <div class="flex justify-between py-2.5 border-b border-white/5">
+              <span class="text-gray-500">Telefone</span>
+              <span class="font-medium">${u.phone || 'Não informado'}</span>
+            </div>
+            <div class="flex justify-between py-2.5">
+              <span class="text-gray-500">Status na Catraca</span>
+              <span class="font-bold ${u.access_status === 'ACTIVE' ? 'text-green-400' : 'text-red-400'}">${u.access_status === 'ACTIVE' ? 'LIBERADO' : 'BLOQUEADO'}</span>
+            </div>
+          </div>
+          <button id="close-modal-btn" class="w-full py-3 rounded-xl font-bold text-sm" style="background:#BFFF00;color:#0a0a0a">Fechar</button>
+        </div>
+      </div>
+    `;
+  } else if (state.modal.type === 'add-student') {
+    container.innerHTML = `
+      <div id="modal-backdrop" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-4 animate-overlay">
+        <div class="glass w-full max-w-md rounded-3xl p-6 animate-slide-up border border-white/10" onclick="event.stopPropagation()">
+          <div class="flex items-center justify-between mb-5">
+            <h3 class="text-lg font-bold">Novo Aluno</h3>
+            <button id="close-modal" class="p-2 rounded-xl hover:bg-white/5">${icons.x}</button>
+          </div>
+          <div class="space-y-3 mb-6">
+            <div>
+              <label class="text-xs text-gray-500 uppercase mb-1 block">Nome completo *</label>
+              <input id="new-st-name" type="text" placeholder="Ex: João da Silva" class="w-full px-3.5 py-3 rounded-xl text-sm"/>
+            </div>
+            <div>
+              <label class="text-xs text-gray-500 uppercase mb-1 block">E-mail *</label>
+              <input id="new-st-email" type="email" placeholder="joao@email.com" class="w-full px-3.5 py-3 rounded-xl text-sm"/>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="text-xs text-gray-500 uppercase mb-1 block">WhatsApp</label>
+                <input id="new-st-phone" type="tel" placeholder="+5511999990000" class="w-full px-3.5 py-3 rounded-xl text-sm"/>
+              </div>
+              <div>
+                <label class="text-xs text-gray-500 uppercase mb-1 block">Mensalidade (R$)</label>
+                <input id="new-st-amount" type="number" step="0.01" value="99.90" class="w-full px-3.5 py-3 rounded-xl text-sm"/>
+              </div>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <button id="close-modal-btn" class="flex-1 py-3 rounded-xl font-bold text-sm bg-white/5 text-gray-300">Cancelar</button>
+            <button id="save-new-student" class="flex-1 py-3 rounded-xl font-bold text-sm" style="background:#BFFF00;color:#0a0a0a">Cadastrar</button>
+          </div>
+        </div>
+      </div>
+    `;
+  } else if (state.modal.type === 'confirm-logout') {
+    container.innerHTML = `
+      <div id="modal-backdrop" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 animate-overlay">
+        <div class="glass w-full max-w-sm rounded-3xl p-6 animate-slide-up border border-white/10 text-center" onclick="event.stopPropagation()">
+          <div class="w-12 h-12 rounded-2xl bg-red-500/10 text-red-400 flex items-center justify-center mx-auto mb-4">
+            ${icons.logout}
+          </div>
+          <h3 class="text-lg font-bold mb-1">Encerrar sessão?</h3>
+          <p class="text-xs text-gray-400 mb-6">Você precisará fazer login novamente para acessar sua conta.</p>
+          <div class="flex gap-2">
+            <button id="close-modal-btn" class="flex-1 py-3 rounded-xl font-bold text-sm bg-white/5 text-gray-300">Cancelar</button>
+            <button id="confirm-logout-btn" class="flex-1 py-3 rounded-xl font-bold text-sm bg-red-500 text-white">Sair agora</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+}
+
+// ============ LOGIN & REGISTER ============
+function renderLogin() {
+  const isReg = state.authTab === 'register';
+  return `
+    <div class="min-h-screen hero-gradient bg-grid flex flex-col">
+      <div class="safe-top"></div>
+      <div class="px-6 pt-8 pb-4 flex items-center justify-between animate-fade-in">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11">${icons.logo}</div>
+          <div>
+            <h1 class="text-xl font-bold tracking-tight">Academia<span class="gradient-text">Flow</span></h1>
+            <p class="text-xs text-gray-500">Gestão inteligente para academias</p>
+          </div>
+        </div>
+        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#BFFF00]/10 text-[#BFFF00] border border-[#BFFF00]/20">v1.1</span>
+      </div>
+
+      <div class="flex-1 flex flex-col justify-center px-6 py-6">
+        <div class="animate-slide-up">
+          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-900 border border-gray-800 mb-5">
+            <span class="w-2 h-2 rounded-full pulse-glow" style="background:#BFFF00"></span>
+            <span class="text-xs text-gray-300">PWA • Offline-ready</span>
+          </div>
+          <h2 class="text-3xl font-bold leading-tight mb-2">
+            Sua academia<br/>
+            <span class="gradient-text">na palma da mão.</span>
+          </h2>
+          <p class="text-gray-400 text-sm leading-relaxed mb-6">
+            Fichas de treino, controle de acesso, cobrança recorrente e dashboard — tudo em um só lugar.
+          </p>
+        </div>
+
+        <!-- Auth Tabs -->
+        <div class="grid grid-cols-2 gap-1 p-1 rounded-xl bg-white/[0.04] border border-white/5 mb-5">
+          <button data-auth-tab="login" class="py-2 rounded-lg text-xs font-bold transition-all ${!isReg ? 'bg-[#BFFF00] text-[#0a0a0a]' : 'text-gray-400'}">Entrar</button>
+          <button data-auth-tab="register" class="py-2 rounded-lg text-xs font-bold transition-all ${isReg ? 'bg-[#BFFF00] text-[#0a0a0a]' : 'text-gray-400'}">Criar conta</button>
+        </div>
+
+        ${!isReg ? `
+          <div class="space-y-3.5 animate-fade-in">
+            <div>
+              <label class="text-xs text-gray-500 uppercase tracking-wider mb-1.5 block">E-mail</label>
+              <input id="login-email" type="email" placeholder="seu@email.com" value="admin@irongym.com" class="w-full px-4 py-3.5 rounded-xl text-sm"/>
+            </div>
+            <div>
+              <label class="text-xs text-gray-500 uppercase tracking-wider mb-1.5 block">Senha</label>
+              <input id="login-password" type="password" placeholder="••••••••" value="demo123" class="w-full px-4 py-3.5 rounded-xl text-sm"/>
+            </div>
+            <button id="btn-login" class="w-full font-bold py-3.5 rounded-xl transition-all active:scale-95 mt-1" style="background:#BFFF00;color:#0a0a0a">
+              Entrar
+            </button>
+          </div>
+        ` : `
+          <div class="space-y-3 animate-fade-in">
+            <div>
+              <label class="text-xs text-gray-500 uppercase tracking-wider mb-1 block">Nome completo</label>
+              <input id="reg-name" type="text" placeholder="Seu nome" class="w-full px-4 py-3 rounded-xl text-sm"/>
+            </div>
+            <div>
+              <label class="text-xs text-gray-500 uppercase tracking-wider mb-1 block">E-mail</label>
+              <input id="reg-email" type="email" placeholder="seu@email.com" class="w-full px-4 py-3 rounded-xl text-sm"/>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="text-xs text-gray-500 uppercase tracking-wider mb-1 block">Perfil</label>
+                <select id="reg-role" class="w-full px-3 py-3 rounded-xl text-sm">
+                  <option value="STUDENT">Aluno</option>
+                  <option value="TRAINER">Professor</option>
+                  <option value="ADMIN">Admin</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-xs text-gray-500 uppercase tracking-wider mb-1 block">Senha</label>
+                <input id="reg-pass" type="password" placeholder="••••••" class="w-full px-4 py-3 rounded-xl text-sm"/>
+              </div>
+            </div>
+            <button id="btn-register" class="w-full font-bold py-3.5 rounded-xl transition-all active:scale-95 mt-1" style="background:#BFFF00;color:#0a0a0a">
+              Criar conta e entrar
+            </button>
+          </div>
+        `}
+
+        <div class="pt-5">
+          <p class="text-xs text-gray-500 text-center mb-3">Acesso rápido (demo)</p>
+          <div class="grid grid-cols-3 gap-2">
+            <button data-role="ADMIN" class="quick-login glass rounded-xl py-3 px-2 text-center card-hover">
+              <div class="text-lg mb-1">👑</div>
+              <div class="text-xs font-semibold">Admin</div>
+            </button>
+            <button data-role="TRAINER" class="quick-login glass rounded-xl py-3 px-2 text-center card-hover">
+              <div class="text-lg mb-1">💪</div>
+              <div class="text-xs font-semibold">Professor</div>
+            </button>
+            <button data-role="STUDENT" class="quick-login glass rounded-xl py-3 px-2 text-center card-hover">
+              <div class="text-lg mb-1">🏋️</div>
+              <div class="text-xs font-semibold">Aluno</div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="px-6 pb-6 pt-2 text-center">
+        <p class="text-xs text-gray-600">Micro-SaaS • Multi-tenant • RBAC</p>
+        <p class="text-xs text-gray-700 mt-1">Iron Gym Tenant · Pronto para Netlify</p>
+      </div>
+    </div>
+  `;
+}
+
+// ============ DASHBOARD ============
+function renderDashboard() {
+  const user = state.user;
+  const role = user.role;
+
+  let content = '';
+  if (role === 'ADMIN') content = renderAdminDashboard();
+  else if (role === 'TRAINER') content = renderTrainerDashboard();
+  else content = renderStudentDashboard();
+
+  const tabs = getTabsForRole(role);
+  const overdueCount = state.data.subscriptions.filter(s => s.status === 'overdue').length;
+
+  return `
+    <div class="min-h-screen pb-24" style="background:#0a0a0a">
+      <div class="safe-top"></div>
+
+      <div class="sticky top-0 z-30 glass safe-top">
+        <div class="px-5 py-3.5 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9">${icons.logo}</div>
+            <div>
+              <div class="text-sm font-bold">Iron Gym</div>
+              <div class="text-[10px] text-gray-500 uppercase tracking-wider">${role}</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button id="btn-bell" class="relative p-2 rounded-xl hover:bg-gray-800 transition-colors" title="Notificações">
+              ${icons.bell}
+              ${overdueCount > 0 ? `<span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#BFFF00]"></span>` : ''}
+            </button>
+            <button id="btn-avatar" class="avatar-btn w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm ${state.showUserMenu ? 'active' : ''}" style="background:linear-gradient(135deg,#BFFF00,#4d7a00);color:#0a0a0a">
+              ${user.name.charAt(0).toUpperCase()}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      ${renderUserMenu()}
+
+      <div class="px-5 pt-4">
+        ${content}
+      </div>
+
+      <div class="fixed bottom-0 left-0 right-0 z-40 glass safe-bottom fixed-shell-bar" style="border-top:1px solid #222">
+        <div class="flex justify-around items-center py-2">
+          ${tabs.map(tab => `
+            <button data-tab="${tab.id}" class="tab-btn flex flex-col items-center gap-1 py-2 px-4 ${state.activeTab === tab.id ? 'tab-active' : 'text-gray-500'}">
+              ${icons[tab.icon]}
+              <span class="text-[10px] font-medium">${tab.label}</span>
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ============ USER MENU ============
+function renderUserMenu() {
+  if (!state.showUserMenu) return '';
+  const user = state.user;
+  const roleLabels = { ADMIN: 'Administrador', TRAINER: 'Professor', STUDENT: 'Aluno' };
+
+  return `
+    <div id="menu-overlay" class="fixed inset-0 z-40 animate-overlay" style="background:rgba(0,0,0,0.5)"></div>
+    <div id="user-menu" class="fixed top-16 right-4 sm:right-[calc(50%-224px)] z-50 w-72 glass rounded-2xl overflow-hidden animate-dropdown shadow-2xl" style="border:1px solid rgba(255,255,255,0.1)">
+      <div class="p-4" style="background:linear-gradient(135deg,rgba(191,255,0,0.08),transparent);border-bottom:1px solid rgba(255,255,255,0.06)">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0" style="background:linear-gradient(135deg,#BFFF00,#4d7a00);color:#0a0a0a">
+            ${user.name.charAt(0).toUpperCase()}
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="font-bold text-sm truncate">${user.name}</div>
+            <div class="text-xs text-gray-400 truncate flex items-center gap-1 mt-0.5">
+              ${icons.mail}
+              <span>${user.email}</span>
+            </div>
+          </div>
+        </div>
+        <div class="mt-3 flex items-center gap-2">
+          <span class="px-2 py-1 rounded-md text-[10px] font-bold" style="background:rgba(191,255,0,0.1);color:#BFFF00">
+            ${roleLabels[user.role]}
+          </span>
+          <span class="px-2 py-1 rounded-md text-[10px] font-bold" style="background:${user.access_status === 'ACTIVE' ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)'};color:${user.access_status === 'ACTIVE' ? '#4ade80' : '#f87171'}">
+            ${user.access_status === 'ACTIVE' ? '● Ativo' : '● Bloqueado'}
+          </span>
+        </div>
+      </div>
+
+      <div class="py-2">
+        <button id="menu-profile" class="menu-item w-full px-4 py-3 flex items-center gap-3 text-left">
+          <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(191,255,0,0.1);color:#BFFF00">${icons.user}</div>
+          <div class="flex-1">
+            <div class="text-sm font-semibold">Meu perfil</div>
+            <div class="text-xs text-gray-500">Ver informações da conta</div>
+          </div>
+        </button>
+
+        <button id="menu-switch-account" class="menu-item w-full px-4 py-3 flex items-center gap-3 text-left">
+          <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(59,130,246,0.1);color:#3b82f6">${icons.switchUser}</div>
+          <div class="flex-1">
+            <div class="text-sm font-semibold">Trocar de conta</div>
+            <div class="text-xs text-gray-500">Entrar com outro usuário</div>
+          </div>
+        </button>
+
+        <div style="height:1px;background:rgba(255,255,255,0.06);margin:4px 0"></div>
+
+        <button id="menu-logout" class="menu-item w-full px-4 py-3 flex items-center gap-3 text-left">
+          <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(239,68,68,0.1);color:#ef4444">${icons.logout}</div>
+          <div class="flex-1">
+            <div class="text-sm font-semibold text-red-400">Sair</div>
+            <div class="text-xs text-gray-500">Encerrar sessão atual</div>
+          </div>
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+function getTabsForRole(role) {
+  if (role === 'ADMIN') return [
+    { id: 'home', icon: 'home', label: 'Início' },
+    { id: 'students', icon: 'users', label: 'Alunos' },
+    { id: 'access', icon: 'shield', label: 'Acessos' },
+    { id: 'settings', icon: 'settings', label: 'Config' }
+  ];
+  if (role === 'TRAINER') return [
+    { id: 'home', icon: 'home', label: 'Início' },
+    { id: 'students', icon: 'users', label: 'Alunos' },
+    { id: 'workouts', icon: 'dumbbell', label: 'Fichas' }
+  ];
+  return [
+    { id: 'home', icon: 'home', label: 'Início' },
+    { id: 'workout', icon: 'dumbbell', label: 'Treino' },
+    { id: 'qr', icon: 'qr', label: 'QR Code' }
+  ];
+}
+
+// ============ ADMIN ============
+function renderAdminDashboard() {
+  const tab = state.activeTab;
+  if (tab === 'home') return renderAdminHome();
+  if (tab === 'students') return renderAdminStudents();
+  if (tab === 'access') return renderAdminAccess();
+  if (tab === 'settings') return renderAdminSettings();
+  return '';
+}
+
+function renderAdminHome() {
+  const students = state.data.users.filter(u => u.role === 'STUDENT');
+  const activeStudents = students.filter(s => s.access_status === 'ACTIVE').length;
+  const overdueCount = state.data.subscriptions.filter(s => s.status === 'overdue').length;
+  const deniedToday = state.data.access_logs.filter(l => l.status === 'DENIED').length;
+  const mrr = state.data.subscriptions.filter(s => s.status === 'active').reduce((sum, s) => sum + s.amount, 0);
+
+  return `
+    <div class="animate-fade-in">
+      <div class="mb-6">
+        <h1 class="text-2xl font-bold">Olá, ${state.user.name.split(' ')[0]} 👋</h1>
+        <p class="text-sm text-gray-500 mt-1">Painel executivo • Iron Gym</p>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3 mb-6">
+        <div class="glass rounded-2xl p-4 card-hover">
+          <div class="flex items-center justify-between mb-2">
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center" style="background:rgba(191,255,0,0.1);color:#BFFF00">${icons.users}</div>
+            <span class="text-[10px] text-green-400 font-semibold">Ativos</span>
+          </div>
+          <div class="text-2xl font-bold">${activeStudents}<span class="text-sm text-gray-500 font-normal">/${students.length}</span></div>
+          <div class="text-xs text-gray-500 mt-1">Alunos ativos</div>
+        </div>
+
+        <div class="glass rounded-2xl p-4 card-hover">
+          <div class="flex items-center justify-between mb-2">
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center" style="background:rgba(249,115,22,0.1);color:#f97316">${icons.clock}</div>
+            <span class="text-[10px] text-orange-400 font-semibold">${overdueCount > 0 ? 'Atenção' : 'Em dia'}</span>
+          </div>
+          <div class="text-2xl font-bold">${overdueCount}</div>
+          <div class="text-xs text-gray-500 mt-1">Inadimplentes</div>
+        </div>
+
+        <div class="glass rounded-2xl p-4 card-hover">
+          <div class="flex items-center justify-between mb-2">
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center" style="background:rgba(239,68,68,0.1);color:#ef4444">${icons.lock}</div>
+            <span class="text-[10px] text-gray-500 font-semibold">Logs</span>
+          </div>
+          <div class="text-2xl font-bold">${deniedToday}</div>
+          <div class="text-xs text-gray-500 mt-1">Bloqueios catraca</div>
+        </div>
+
+        <div class="glass rounded-2xl p-4 card-hover">
+          <div class="flex items-center justify-between mb-2">
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center" style="background:rgba(191,255,0,0.1);color:#BFFF00">${icons.dollar}</div>
+            <span class="text-[10px] text-green-400 font-semibold">MRR</span>
+          </div>
+          <div class="text-2xl font-bold">R$ ${mrr.toFixed(0)}</div>
+          <div class="text-xs text-gray-500 mt-1">Receita mensal</div>
+        </div>
+      </div>
+
+      <div class="glass rounded-2xl p-5 mb-4">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h3 class="font-bold">Receita Semanal</h3>
+            <p class="text-xs text-gray-500">Últimos 7 dias</p>
+          </div>
+          <div class="text-right">
+            <div class="text-xl font-bold gradient-text">R$ ${(mrr * 0.25).toFixed(0)}</div>
+            <div class="text-xs text-green-400">+8.2%</div>
+          </div>
+        </div>
+        <div class="flex items-end justify-between gap-2 h-24">
+          ${[45, 62, 38, 75, 58, 82, 68].map((h, i) => `
+            <div class="flex-1 flex flex-col items-center gap-1">
+              <div class="w-full rounded-t-lg transition-all" style="height: ${h}%;background:linear-gradient(to top,rgba(191,255,0,0.3),#BFFF00)"></div>
+              <span class="text-[10px] text-gray-500">${['S','T','Q','Q','S','S','D'][i]}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <div class="glass rounded-2xl p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-bold">Atividade recente</h3>
+          <button data-tab="access" class="tab-btn text-xs font-semibold text-[#BFFF00]">Ver tudo</button>
+        </div>
+        <div class="space-y-3">
+          ${[...state.data.access_logs].reverse().slice(0, 4).map(log => {
+            const user = state.data.users.find(u => u.id === log.user_id);
+            const time = new Date(log.timestamp).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            const granted = log.status === 'GRANTED';
+            return `
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold" style="background:#1a1a1a">
+                  ${user ? user.name.charAt(0) : '?'}
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="text-sm font-medium truncate">${user ? user.name : 'Usuário'}</div>
+                  <div class="text-xs text-gray-500">${log.method} • ${time}</div>
+                </div>
+                <div class="px-2 py-1 rounded-lg text-[10px] font-bold" style="background:${granted ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)'};color:${granted ? '#4ade80' : '#f87171'}">
+                  ${granted ? 'LIBERADO' : 'BLOQUEADO'}
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderAdminStudents() {
+  let students = state.data.users.filter(u => u.role === 'STUDENT');
+  if (state.studentSearch.trim()) {
+    const q = state.studentSearch.toLowerCase();
+    students = students.filter(s => s.name.toLowerCase().includes(q) || s.email.toLowerCase().includes(q));
+  }
+  if (state.studentFilter !== 'ALL') {
+    students = students.filter(s => s.access_status === state.studentFilter);
+  }
+
+  return `
+    <div class="animate-fade-in">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h1 class="text-2xl font-bold">Alunos</h1>
+          <p class="text-sm text-gray-500">${students.length} exibidos</p>
+        </div>
+        <button id="btn-open-add-student" class="w-10 h-10 rounded-xl flex items-center justify-center card-hover" style="background:#BFFF00;color:#0a0a0a" title="Novo aluno">
+          ${icons.plus}
+        </button>
+      </div>
+
+      <!-- Search & Filter -->
+      <div class="relative mb-3">
+        <div class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500">${icons.search}</div>
+        <input id="student-search-input" type="text" placeholder="Buscar aluno por nome ou e-mail..." value="${state.studentSearch}" class="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm"/>
+      </div>
+
+      <div class="flex gap-1.5 mb-4">
+        ${[
+          { id: 'ALL', label: 'Todos' },
+          { id: 'ACTIVE', label: 'Ativos' },
+          { id: 'BLOCKED', label: 'Bloqueados' }
+        ].map(f => `
+          <button data-st-filter="${f.id}" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${state.studentFilter === f.id ? 'bg-[#BFFF00] text-[#0a0a0a]' : 'glass text-gray-400'}">
+            ${f.label}
+          </button>
+        `).join('')}
+      </div>
+
+      <div class="space-y-2">
+        ${students.length === 0 ? `
+          <div class="glass rounded-2xl p-8 text-center text-sm text-gray-500">Nenhum aluno encontrado.</div>
+        ` : students.map(s => {
+          const sub = state.data.subscriptions.find(sub => sub.user_id === s.id);
+          const active = s.access_status === 'ACTIVE';
+          return `
+            <div class="glass rounded-2xl p-4 card-hover">
+              <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-full flex items-center justify-center font-bold flex-shrink-0" style="background:${active ? 'linear-gradient(135deg,#BFFF00,#4d7a00)' : 'linear-gradient(135deg,#ef4444,#991b1b)'};color:${active ? '#0a0a0a' : '#fff'}">
+                  ${s.name.charAt(0)}
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="font-semibold text-sm truncate">${s.name}</div>
+                  <div class="text-xs text-gray-500 truncate">${s.email}</div>
+                  ${sub ? `<div class="text-[10px] text-gray-500 mt-0.5">R$ ${sub.amount.toFixed(2)} • Venc. ${new Date(sub.due_date).toLocaleDateString('pt-BR')}</div>` : ''}
+                </div>
+                <button data-toggle-status="${s.id}" class="px-2.5 py-1.5 rounded-lg text-[10px] font-bold flex items-center gap-1 transition-all active:scale-95" style="background:${active ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.12)'};color:${active ? '#4ade80' : '#f87171'}" title="Toque para alternar status">
+                  ${active ? 'ATIVO' : 'BLOQUEADO'}
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function renderAdminAccess() {
+  const logs = [...state.data.access_logs].reverse();
+  const students = state.data.users.filter(u => u.role === 'STUDENT');
+  return `
+    <div class="animate-fade-in">
+      <div class="mb-5">
+        <h1 class="text-2xl font-bold">Controle de Acesso</h1>
+        <p class="text-sm text-gray-500">Simulador e logs da catraca</p>
+      </div>
+
+      <!-- Turnstile Simulator -->
+      <div class="glass rounded-2xl p-4 mb-5 border border-[#BFFF00]/20">
+        <div class="text-xs font-bold text-[#BFFF00] uppercase tracking-wider mb-2">⚡ Simular Passagem na Catraca</div>
+        <div class="flex gap-2">
+          <select id="sim-student-select" class="flex-1 px-3 py-2.5 rounded-xl text-xs">
+            ${students.map(s => `<option value="${s.id}">${s.name} (${s.access_status === 'ACTIVE' ? 'Ativo' : 'Bloqueado'})</option>`).join('')}
+          </select>
+          <button id="btn-sim-gate" class="px-4 py-2.5 rounded-xl font-bold text-xs whitespace-nowrap active:scale-95" style="background:#BFFF00;color:#0a0a0a">
+            Validar QR
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-3 gap-2 mb-5">
+        <div class="glass rounded-xl p-3 text-center">
+          <div class="text-xl font-bold text-green-400">${logs.filter(l => l.status === 'GRANTED').length}</div>
+          <div class="text-[10px] text-gray-500 mt-1">Liberados</div>
+        </div>
+        <div class="glass rounded-xl p-3 text-center">
+          <div class="text-xl font-bold text-red-400">${logs.filter(l => l.status === 'DENIED').length}</div>
+          <div class="text-[10px] text-gray-500 mt-1">Negados</div>
+        </div>
+        <div class="glass rounded-xl p-3 text-center">
+          <div class="text-xl font-bold" style="color:#BFFF00">${logs.length}</div>
+          <div class="text-[10px] text-gray-500 mt-1">Total</div>
+        </div>
+      </div>
+
+      <div class="glass rounded-2xl p-4">
+        <h3 class="font-bold mb-4">Histórico recente</h3>
+        <div class="space-y-3">
+          ${logs.map(log => {
+            const user = state.data.users.find(u => u.id === log.user_id);
+            const time = new Date(log.timestamp).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            const granted = log.status === 'GRANTED';
+            return `
+              <div class="flex items-center gap-3 pb-3 border-b border-gray-800 last:border-0 last:pb-0">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:${granted ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)'};color:${granted ? '#4ade80' : '#f87171'}">
+                  ${granted ? icons.check : icons.lock}
+                </div>
+                <div class="flex-1">
+                  <div class="text-sm font-semibold">${user ? user.name : 'Usuário'}</div>
+                  <div class="text-xs text-gray-500">Método: ${log.method} • ${time}</div>
+                </div>
+                <div class="text-[10px] font-bold" style="color:${granted ? '#4ade80' : '#f87171'}">
+                  ${granted ? '✓ GRANTED' : '✗ DENIED'}
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderAdminSettings() {
+  const tenant = state.data.tenants[0];
+  return `
+    <div class="animate-fade-in">
+      <div class="mb-5">
+        <h1 class="text-2xl font-bold">Configurações</h1>
+        <p class="text-sm text-gray-500">Tenant: ${tenant.name}</p>
+      </div>
+
+      <div class="space-y-3">
+        <div class="glass rounded-2xl p-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(191,255,0,0.1);color:#BFFF00">${icons.dollar}</div>
+            <div class="flex-1">
+              <div class="font-semibold text-sm">Gateway de Pagamento</div>
+              <div class="text-xs text-gray-500">${tenant.gateway_config.provider}</div>
+            </div>
+            <span class="px-2 py-1 rounded-lg text-[10px] font-bold" style="background:rgba(34,197,94,0.1);color:#4ade80">ATIVO</span>
+          </div>
+        </div>
+
+        <div class="glass rounded-2xl p-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(191,255,0,0.1);color:#BFFF00">${icons.shield}</div>
+            <div class="flex-1">
+              <div class="font-semibold text-sm">Catraca / Acesso</div>
+              <div class="text-xs text-gray-500 truncate">${tenant.gate_api_config.endpoint}</div>
+            </div>
+            <span class="px-2 py-1 rounded-lg text-[10px] font-bold" style="background:rgba(34,197,94,0.1);color:#4ade80">SYNC</span>
+          </div>
+        </div>
+
+        <div class="glass rounded-2xl p-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(34,197,94,0.1);color:#4ade80">${icons.whatsapp}</div>
+            <div class="flex-1">
+              <div class="font-semibold text-sm">WhatsApp Bot</div>
+              <div class="text-xs text-gray-500">${tenant.whatsapp_config.provider}</div>
+            </div>
+            <span class="px-2 py-1 rounded-lg text-[10px] font-bold" style="background:rgba(34,197,94,0.1);color:#4ade80">ONLINE</span>
+          </div>
+        </div>
+
+        <div class="glass rounded-2xl p-4">
+          <div class="text-center py-3">
+            <div class="text-3xl mb-2">📱</div>
+            <div class="font-semibold text-sm mb-1">Instalar App (PWA)</div>
+            <div class="text-xs text-gray-500 mb-3">Funciona offline e na tela inicial</div>
+            ${state.deferredInstallPrompt ? `
+              <button id="btn-install-pwa" class="w-full py-2.5 rounded-xl font-bold text-xs mb-2 flex items-center justify-center gap-2" style="background:#BFFF00;color:#0a0a0a">
+                ${icons.download} Instalar aplicativo agora
+              </button>
+            ` : `
+              <div class="text-xs text-gray-400 bg-gray-900/80 rounded-xl p-3 text-left leading-relaxed">
+                💡 <b>Chrome / Edge:</b> Menu (⋮) → "Instalar aplicativo"<br/>
+                📱 <b>Safari iOS:</b> Compartilhar → "Adicionar à Tela de Início"
+              </div>
+            `}
+          </div>
+        </div>
+
+        <button id="btn-reset-demo" class="w-full py-3 rounded-xl text-xs font-semibold text-gray-400 hover:text-white glass">
+          Restaurar dados iniciais da demo
+        </button>
+      </div>
+
+      <div class="mt-6 text-center text-xs text-gray-600">
+        AcademiaFlow v1.1.0 • Tenant ID: ${tenant.id}
+      </div>
+    </div>
+  `;
+}
+
+// ============ TRAINER ============
+function renderTrainerDashboard() {
+  const tab = state.activeTab;
+  if (tab === 'home') return renderTrainerHome();
+  if (tab === 'students') return renderTrainerStudents();
+  if (tab === 'workouts') return renderTrainerWorkouts();
+  return '';
+}
+
+function renderTrainerHome() {
+  const students = state.data.users.filter(u => u.role === 'STUDENT');
+  const myWorkouts = state.data.workouts;
+
+  return `
+    <div class="animate-fade-in">
+      <div class="mb-6">
+        <h1 class="text-2xl font-bold">Bom treino, ${state.user.name.split(' ')[0]} 💪</h1>
+        <p class="text-sm text-gray-500 mt-1">Você gerencia ${myWorkouts.length} fichas ativas</p>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3 mb-6">
+        <div class="glass rounded-2xl p-4">
+          <div class="w-9 h-9 rounded-xl flex items-center justify-center mb-2" style="background:rgba(191,255,0,0.1);color:#BFFF00">${icons.users}</div>
+          <div class="text-2xl font-bold">${students.length}</div>
+          <div class="text-xs text-gray-500">Alunos</div>
+        </div>
+        <div class="glass rounded-2xl p-4">
+          <div class="w-9 h-9 rounded-xl flex items-center justify-center mb-2" style="background:rgba(191,255,0,0.1);color:#BFFF00">${icons.dumbbell}</div>
+          <div class="text-2xl font-bold">${myWorkouts.length}</div>
+          <div class="text-xs text-gray-500">Fichas</div>
+        </div>
+      </div>
+
+      <div class="glass rounded-2xl p-5">
+        <h3 class="font-bold mb-4">Ações rápidas</h3>
+        <div class="grid grid-cols-2 gap-2">
+          <button data-action="new-workout" class="rounded-xl p-4 font-bold text-sm flex flex-col items-center gap-2 card-hover" style="background:#BFFF00;color:#0a0a0a">
+            ${icons.plus}
+            Nova ficha
+          </button>
+          <button data-tab="students" class="tab-btn glass rounded-xl p-4 font-bold text-sm flex flex-col items-center gap-2 card-hover">
+            ${icons.users}
+            Ver alunos
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderTrainerStudents() {
+  const students = state.data.users.filter(u => u.role === 'STUDENT');
+  return `
+    <div class="animate-fade-in">
+      <div class="mb-5">
+        <h1 class="text-2xl font-bold">Meus alunos</h1>
+        <p class="text-sm text-gray-500">Toque para criar ou editar ficha</p>
+      </div>
+
+      <div class="space-y-2">
+        ${students.map(s => {
+          const workout = state.data.workouts.find(w => w.student_id === s.id);
+          return `
+            <button data-student="${s.id}" class="student-card w-full glass rounded-2xl p-4 card-hover text-left">
+              <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-full flex items-center justify-center font-bold" style="background:linear-gradient(135deg,#BFFF00,#4d7a00);color:#0a0a0a">
+                  ${s.name.charAt(0)}
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="font-semibold text-sm truncate">${s.name}</div>
+                  <div class="text-xs text-gray-500 truncate">${workout ? workout.title : 'Sem ficha cadastrada'}</div>
+                </div>
+                <div class="text-gray-500">${icons.arrowRight}</div>
+              </div>
+            </button>
+          `;
+        }).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function renderTrainerWorkouts() {
+  const myWorkouts = state.data.workouts;
+  return `
+    <div class="animate-fade-in">
+      <div class="flex items-center justify-between mb-5">
+        <div>
+          <h1 class="text-2xl font-bold">Fichas de treino</h1>
+          <p class="text-sm text-gray-500">${myWorkouts.length} fichas criadas</p>
+        </div>
+        <button data-action="new-workout" class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:#BFFF00;color:#0a0a0a">
+          ${icons.plus}
+        </button>
+      </div>
+
+      <div class="space-y-3">
+        ${myWorkouts.map(w => {
+          const student = state.data.users.find(u => u.id === w.student_id);
+          return `
+            <div class="glass rounded-2xl p-4 card-hover">
+              <div class="flex items-start justify-between mb-3">
+                <div class="flex-1">
+                  <div class="font-bold text-sm">${w.title}</div>
+                  <div class="text-xs text-gray-500 mt-1">${student ? student.name : 'Aluno'} • ${w.exercises_json.length} exercícios</div>
+                </div>
+                <div class="flex items-center gap-1">
+                  <button data-edit-workout="${w.id}" class="p-2 rounded-lg hover:bg-gray-800 text-gray-300" title="Editar">
+                    ${icons.edit}
+                  </button>
+                  <button data-delete-workout="${w.id}" class="p-2 rounded-lg hover:bg-red-500/10 text-red-400" title="Excluir">
+                    ${icons.trash}
+                  </button>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 text-xs text-gray-500">
+                ${icons.clock}
+                <span>Atualizado em ${new Date(w.updated_at).toLocaleDateString('pt-BR')}</span>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </div>
+  `;
+}
+
+// ============ STUDENT ============
+function renderStudentDashboard() {
+  const tab = state.activeTab;
+  if (tab === 'home') return renderStudentHome();
+  if (tab === 'workout') return renderStudentWorkout();
+  if (tab === 'qr') return renderStudentQR();
+  return '';
+}
+
+function renderStudentHome() {
+  const workout = state.data.workouts.find(w => w.student_id === state.user.id) || state.data.workouts[0];
+  const sub = state.data.subscriptions.find(s => s.user_id === state.user.id);
+  const active = state.user.access_status === 'ACTIVE';
+  const completedCount = state.data.workout_history[state.user.id] || 12;
+
+  return `
+    <div class="animate-fade-in">
+      <div class="mb-6">
+        <h1 class="text-2xl font-bold">Fala, ${state.user.name.split(' ')[0]} 🔥</h1>
+        <p class="text-sm text-gray-500 mt-1">Bora treinar hoje?</p>
+      </div>
+
+      <div class="glass rounded-2xl p-5 mb-4" style="border-left:4px solid ${active ? '#BFFF00' : '#ef4444'}">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <div class="w-2 h-2 rounded-full ${active ? 'pulse-glow' : ''}" style="background:${active ? '#BFFF00' : '#ef4444'}"></div>
+            <span class="text-xs font-bold" style="color:${active ? '#BFFF00' : '#f87171'}">${active ? 'ACESSO ATIVO' : 'ACESSO BLOQUEADO'}</span>
+          </div>
+          ${sub ? `<span class="text-xs text-gray-500">Vence ${new Date(sub.due_date).toLocaleDateString('pt-BR')}</span>` : ''}
+        </div>
+        ${!active ? `
+          <div class="rounded-xl p-3 mb-3" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2)">
+            <p class="text-xs" style="color:#fca5a5">Sua mensalidade está em atraso. Regularize para liberar o acesso.</p>
+          </div>
+          <button id="btn-regularize" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2.5 rounded-xl text-sm transition-colors">Regularizar agora (PIX Demo)</button>
+        ` : `
+          <div class="flex items-center gap-3 text-xs text-gray-400">
+            <div class="flex items-center gap-1 text-green-400">${icons.check}<span>Catraca liberada</span></div>
+            <div class="flex items-center gap-1">${icons.whatsapp}<span>Notificações on</span></div>
+          </div>
+        `}
+      </div>
+
+      ${workout ? `
+        <div class="glass rounded-2xl p-5 mb-4" style="background:linear-gradient(135deg,#1a1a1a,#111)">
+          <div class="flex items-center justify-between mb-3">
+            <div class="text-xs text-gray-500 uppercase tracking-wider">Treino de hoje</div>
+            <div class="flex items-center gap-1 text-xs" style="color:#BFFF00"><span class="font-bold">● Pronto</span></div>
+          </div>
+          <h3 class="text-xl font-bold mb-1">${workout.title}</h3>
+          <p class="text-sm text-gray-400 mb-4">${workout.exercises_json.length} exercícios</p>
+
+          <button id="btn-start-workout" class="w-full font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 card-hover" style="background:#BFFF00;color:#0a0a0a">
+            ${icons.zap}
+            Iniciar treino
+          </button>
+        </div>
+      ` : `
+        <div class="glass rounded-2xl p-8 text-center mb-4">
+          <div class="text-4xl mb-3">🏋️</div>
+          <p class="text-sm text-gray-400">Aguarde seu professor criar sua ficha</p>
+        </div>
+      `}
+
+      <div class="grid grid-cols-3 gap-2">
+        <div class="glass rounded-xl p-3 text-center">
+          <div class="text-xl font-bold gradient-text">${completedCount}</div>
+          <div class="text-[10px] text-gray-500 mt-1">Treinos</div>
+        </div>
+        <div class="glass rounded-xl p-3 text-center">
+          <div class="text-xl font-bold gradient-text">4.2h</div>
+          <div class="text-[10px] text-gray-500 mt-1">Semana</div>
+        </div>
+        <div class="glass rounded-xl p-3 text-center">
+          <div class="text-xl font-bold gradient-text">🔥 7</div>
+          <div class="text-[10px] text-gray-500 mt-1">Sequência</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderStudentWorkout() {
+  const workout = state.data.workouts.find(w => w.student_id === state.user.id) || state.data.workouts[0];
+  if (!workout) {
+    return `
+      <div class="animate-fade-in text-center py-20">
+        <div class="text-5xl mb-4">📋</div>
+        <h2 class="text-xl font-bold mb-2">Sem ficha ativa</h2>
+        <p class="text-sm text-gray-500">Fale com seu professor</p>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="animate-fade-in">
+      <div class="mb-5">
+        <h1 class="text-2xl font-bold">${workout.title}</h1>
+        <p class="text-sm text-gray-500 mt-1">${workout.exercises_json.length} exercícios • ${new Date(workout.updated_at).toLocaleDateString('pt-BR')}</p>
+      </div>
+
+      <div class="space-y-3">
+        ${workout.exercises_json.map((ex, idx) => {
+          const key = `${workout.id}_${idx}`;
+          const completedSets = state.data.completed_sets[key] || 0;
+          const progress = (completedSets / ex.sets) * 100;
+          return `
+            <div class="glass rounded-2xl p-4">
+              <div class="flex items-start gap-3 mb-3">
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm flex-shrink-0" style="background:#BFFF00;color:#0a0a0a">
+                  ${idx + 1}
+                </div>
+                <div class="flex-1">
+                  <div class="font-bold text-sm">${ex.name}</div>
+                  <div class="flex flex-wrap gap-2 mt-2">
+                    <span class="px-2 py-0.5 rounded-md text-xs" style="background:#1a1a1a">${ex.sets}×${ex.reps}</span>
+                    <span class="px-2 py-0.5 rounded-md text-xs" style="background:#1a1a1a">${ex.load}</span>
+                    <span class="px-2 py-0.5 rounded-md text-xs" style="background:#1a1a1a">⏱ ${ex.rest}</span>
+                  </div>
+                  ${ex.notes ? `<p class="text-xs text-gray-500 mt-2 italic">💡 ${ex.notes}</p>` : ''}
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2 mb-2">
+                <div class="flex-1 h-1.5 rounded-full overflow-hidden" style="background:#1a1a1a">
+                  <div class="h-full transition-all" style="width: ${progress}%;background:linear-gradient(to right,#BFFF00,#4ade80)"></div>
+                </div>
+                <span class="text-xs text-gray-500">${completedSets}/${ex.sets}</span>
+              </div>
+
+              <div class="flex gap-1.5">
+                ${Array(ex.sets).fill(0).map((_, setIdx) => {
+                  const done = setIdx < completedSets;
+                  return `
+                    <button data-set="${key}_${setIdx}" data-rest="${ex.rest}" class="set-btn flex-1 py-2 rounded-lg text-xs font-bold transition-all ${done ? '' : 'hover:bg-gray-700'}" style="background:${done ? '#BFFF00' : '#1a1a1a'};color:${done ? '#0a0a0a' : '#9ca3af'}">
+                      ${done ? '✓' : `S${setIdx + 1}`}
+                    </button>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+
+      <button id="btn-start-workout" class="w-full mt-6 font-bold py-4 rounded-xl flex items-center justify-center gap-2 card-hover sticky bottom-24 shadow-lg" style="background:#BFFF00;color:#0a0a0a;box-shadow:0 10px 30px rgba(191,255,0,0.2)">
+        ${icons.zap}
+        Iniciar modo treino
+      </button>
+    </div>
+  `;
+}
+
+function renderStudentQR() {
+  const token = btoa(`${state.user.id}:${state.qrSeed}`).substring(0, 24);
+  const active = state.user.access_status === 'ACTIVE';
+
+  return `
+    <div class="animate-fade-in">
+      <div class="flex items-center justify-between mb-5">
+        <div>
+          <h1 class="text-2xl font-bold">QR de Acesso</h1>
+          <p class="text-sm text-gray-500 mt-1">Aproxime da catraca para entrar</p>
+        </div>
+        <button id="btn-refresh-qr" class="p-2.5 rounded-xl glass hover:bg-white/10 text-[#BFFF00]" title="Gerar novo código">
+          ${icons.refresh}
+        </button>
+      </div>
+
+      <div class="glass rounded-2xl p-6 mb-4 text-center">
+        <div class="relative inline-block mb-4">
+          <div class="w-56 h-56 bg-white rounded-2xl p-4 mx-auto flex items-center justify-center ${!active ? 'opacity-40 grayscale' : ''}">
+            <svg viewBox="0 0 100 100" class="w-full h-full">
+              <rect width="100" height="100" fill="white"/>
+              <rect x="5" y="5" width="25" height="25" fill="black"/>
+              <rect x="10" y="10" width="15" height="15" fill="white"/>
+              <rect x="13" y="13" width="9" height="9" fill="black"/>
+              <rect x="70" y="5" width="25" height="25" fill="black"/>
+              <rect x="75" y="10" width="15" height="15" fill="white"/>
+              <rect x="78" y="13" width="9" height="9" fill="black"/>
+              <rect x="5" y="70" width="25" height="25" fill="black"/>
+              <rect x="10" y="75" width="15" height="15" fill="white"/>
+              <rect x="13" y="78" width="9" height="9" fill="black"/>
+              ${generateQRData()}
+            </svg>
+          </div>
+          <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div class="w-14 h-14 rounded-xl flex items-center justify-center border-4 border-white" style="background:#0a0a0a">
+              <div class="w-8 h-8">${icons.logo}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-xs text-gray-500 mb-2">Token JWT • Curta duração</div>
+        <div class="font-mono text-[10px] text-gray-400 rounded-lg px-3 py-2 break-all" style="background:#111">
+          ${token}...
+        </div>
+
+        <div class="mt-4 flex items-center justify-center gap-2 text-xs">
+          <div class="w-2 h-2 rounded-full pulse-glow" style="background:#BFFF00"></div>
+          <span class="font-semibold" style="color:#BFFF00">Renovação automática</span>
+        </div>
+
+        <div id="qr-timer" class="mt-2 text-2xl font-bold gradient-text">01:00</div>
+      </div>
+
+      <div class="glass rounded-2xl p-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:${active ? 'rgba(191,255,0,0.1)' : 'rgba(239,68,68,0.1)'};color:${active ? '#BFFF00' : '#ef4444'}">${icons.shield}</div>
+          <div class="flex-1">
+            <div class="text-sm font-bold">Acesso ${active ? 'autorizado' : 'bloqueado'}</div>
+            <div class="text-xs text-gray-500">Status sincronizado com a catraca</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function generateQRData() {
+  let rects = '';
+  const seed = state.user.id.charCodeAt(0) + (state.qrSeed % 97);
+  for (let row = 0; row < 20; row++) {
+    for (let col = 0; col < 20; col++) {
+      if ((row < 7 && col < 7) || (row < 7 && col > 12) || (row > 12 && col < 7)) continue;
+      if (((row * 7 + col * 13 + seed) % 3) === 0) {
+        rects += `<rect x="${5 + col * 4.5}" y="${5 + row * 4.5}" width="4" height="4" fill="black"/>`;
+      }
+    }
+  }
+  return rects;
+}
+
+// ============ WORKOUT MODE ============
+function renderWorkoutMode() {
+  const workout = state.data.workouts.find(w => w.student_id === state.user.id) || state.data.workouts[0];
+  if (!workout) return '<div class="p-8 text-center">Sem ficha</div>';
+
+  const totalSets = workout.exercises_json.reduce((s, e) => s + e.sets, 0);
+  const completedSets = workout.exercises_json.reduce((s, e, idx) => {
+    const key = `${workout.id}_${idx}`;
+    return s + (state.data.completed_sets[key] || 0);
+  }, 0);
+  const progress = Math.round((completedSets / totalSets) * 100);
+
+  return `
+    <div class="min-h-screen bg-grid pb-10" style="background-color:#0a0a0a">
+      <div class="safe-top"></div>
+
+      <div class="sticky top-0 z-30 glass safe-top">
+        <div class="px-5 py-3 flex items-center justify-between">
+          <button id="btn-exit-mode" class="p-2 rounded-xl hover:bg-gray-800">
+            ${icons.x}
+          </button>
+          <div class="text-center">
+            <div class="text-[10px] text-gray-500 uppercase tracking-wider">Modo Treino</div>
+            <div class="text-sm font-bold">${workout.title}</div>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="w-2 h-2 rounded-full pulse-glow" style="background:#ef4444"></div>
+            <span class="text-xs font-bold text-red-400" id="timer">00:00</span>
+          </div>
+        </div>
+
+        <div class="h-1" style="background:#1a1a1a">
+          <div id="mode-progress" class="h-full transition-all" style="width: ${progress}%;background:linear-gradient(to right,#BFFF00,#4ade80)"></div>
+        </div>
+      </div>
+
+      ${state.restTimer.active ? `
+        <div class="mx-5 mt-4 glass rounded-2xl p-4 border border-[#BFFF00]/40 flex items-center justify-between animate-fade-in">
+          <div>
+            <div class="text-[10px] uppercase tracking-wider text-[#BFFF00] font-bold">Descanso ativo</div>
+            <div id="rest-timer-val" class="text-2xl font-bold font-mono">${state.restTimer.seconds}s</div>
+          </div>
+          <div class="flex gap-2">
+            <button id="btn-add-rest" class="px-3 py-2 rounded-xl text-xs font-bold bg-white/10">+15s</button>
+            <button id="btn-skip-rest" class="px-3 py-2 rounded-xl text-xs font-bold" style="background:#BFFF00;color:#0a0a0a">Pular</button>
+          </div>
+        </div>
+      ` : ''}
+
+      <div class="px-5 py-4">
+        <div class="text-center mb-5">
+          <div class="text-5xl font-bold gradient-text mb-1">${progress}%</div>
+          <div class="text-xs text-gray-500">${completedSets} de ${totalSets} séries concluídas</div>
+        </div>
+
+        <div class="space-y-3">
+          ${workout.exercises_json.map((ex, idx) => {
+            const key = `${workout.id}_${idx}`;
+            const completed = state.data.completed_sets[key] || 0;
+            const isCurrent = completed < ex.sets && (idx === 0 || (state.data.completed_sets[`${workout.id}_${idx-1}`] || 0) === workout.exercises_json[idx-1].sets);
+            const isDone = completed === ex.sets;
+            return `
+              <div class="glass rounded-2xl p-4 ${isCurrent ? 'ring-2' : ''}" style="${isCurrent ? 'border-color:#BFFF00' : ''} ${isDone ? 'opacity:0.6' : ''}">
+                <div class="flex items-start gap-3 mb-3">
+                  <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm flex-shrink-0" style="background:${isDone ? '#4ade80' : (isCurrent ? '#BFFF00' : '#1a1a1a')};color:${isDone || isCurrent ? '#0a0a0a' : '#6b7280'}">
+                    ${isDone ? '✓' : idx + 1}
+                  </div>
+                  <div class="flex-1">
+                    <div class="font-bold text-sm">${ex.name}</div>
+                    <div class="text-xs text-gray-500">${ex.sets}×${ex.reps} • ${ex.load} • Descanso ${ex.rest}</div>
+                  </div>
+                </div>
+
+                <div class="flex gap-1.5">
+                  ${Array(ex.sets).fill(0).map((_, setIdx) => {
+                    const done = setIdx < completed;
+                    return `
+                      <button data-set="${key}_${setIdx}" data-rest="${ex.rest}" class="set-btn flex-1 py-3 rounded-lg text-sm font-bold transition-all" style="background:${done ? '#BFFF00' : '#1a1a1a'};color:${done ? '#0a0a0a' : '#9ca3af'}">
+                        ${done ? '✓' : `S${setIdx + 1}`}
+                      </button>
+                    `;
+                  }).join('')}
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+
+        ${progress === 100 ? `
+          <div class="mt-6 glass rounded-2xl p-6 text-center" style="border:2px solid #BFFF00">
+            <div class="text-5xl mb-3">🏆</div>
+            <h3 class="text-xl font-bold gradient-text mb-2">Treino concluído!</h3>
+            <p class="text-sm text-gray-400 mb-4">Parabéns! Você arrasou hoje.</p>
+            <button id="btn-finish-workout" class="w-full font-bold py-3 rounded-xl" style="background:#BFFF00;color:#0a0a0a">Finalizar e registrar</button>
+          </div>
+        ` : ''}
+      </div>
+    </div>
+  `;
+}
+
+// ============ WORKOUT EDITOR ============
+function renderWorkoutView() {
+  const workout = state.editingWorkout;
+  const isNew = !workout || !workout.id;
+  const students = state.data.users.filter(u => u.role === 'STUDENT');
+
+  return `
+    <div class="min-h-screen pb-32" style="background:#0a0a0a">
+      <div class="safe-top"></div>
+
+      <div class="sticky top-0 z-30 glass safe-top">
+        <div class="px-5 py-4 flex items-center justify-between">
+          <button id="btn-back" class="p-2 rounded-xl hover:bg-gray-800">
+            ${icons.arrow}
+          </button>
+          <h2 class="font-bold">${isNew ? 'Nova ficha' : 'Editar ficha'}</h2>
+          <div class="w-9"></div>
+        </div>
+      </div>
+
+      <div class="px-5 py-4">
+        <div class="space-y-4">
+          <div>
+            <label class="text-xs text-gray-500 uppercase tracking-wider mb-2 block">Aluno</label>
+            <select id="f-student" class="w-full px-4 py-3 rounded-xl text-sm">
+              <option value="">Selecione...</option>
+              ${students.map(s => `<option value="${s.id}" ${workout && workout.student_id === s.id ? 'selected' : ''}>${s.name}</option>`).join('')}
+            </select>
+          </div>
+
+          <div>
+            <label class="text-xs text-gray-500 uppercase tracking-wider mb-2 block">Título do treino</label>
+            <input id="f-title" type="text" placeholder="Ex: Treino A - Peito e Tríceps" value="${workout ? (workout.title || '') : ''}" class="w-full px-4 py-3 rounded-xl text-sm"/>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <label class="text-xs text-gray-500 uppercase tracking-wider">Exercícios</label>
+              <button id="btn-add-exercise" class="text-xs font-bold flex items-center gap-1" style="color:#BFFF00">
+                ${icons.plus} Adicionar
+              </button>
+            </div>
+            <div id="exercises-list" class="space-y-3">
+              ${(workout ? workout.exercises_json : []).map((ex, idx) => renderExerciseForm(ex, idx)).join('')}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fixed bottom-0 left-0 right-0 glass safe-bottom p-4 fixed-shell-bar" style="border-top:1px solid #222">
+        <button id="btn-save-workout" class="w-full font-bold py-3.5 rounded-xl" style="background:#BFFF00;color:#0a0a0a">
+          Salvar ficha
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+function renderExerciseForm(ex, idx) {
+  return `
+    <div class="glass rounded-2xl p-4" data-exercise-idx="${idx}">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-lg flex items-center justify-center font-bold text-xs" style="background:#BFFF00;color:#0a0a0a">${idx + 1}</div>
+          <span class="text-sm font-bold">Exercício</span>
+        </div>
+        <button data-remove-exercise="${idx}" class="p-1.5 rounded-lg hover:bg-red-500/10 text-red-400">
+          ${icons.trash}
+        </button>
+      </div>
+      <div class="space-y-2">
+        <input type="text" placeholder="Nome do exercício" value="${ex.name}" data-field="name" class="ex-field w-full px-3 py-2 rounded-lg text-sm"/>
+        <div class="grid grid-cols-2 gap-2">
+          <input type="number" placeholder="Séries" value="${ex.sets}" data-field="sets" class="ex-field px-3 py-2 rounded-lg text-sm"/>
+          <input type="text" placeholder="Reps (ex: 10-12)" value="${ex.reps}" data-field="reps" class="ex-field px-3 py-2 rounded-lg text-sm"/>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <input type="text" placeholder="Carga (ex: 60kg)" value="${ex.load}" data-field="load" class="ex-field px-3 py-2 rounded-lg text-sm"/>
+          <input type="text" placeholder="Descanso (ex: 60s)" value="${ex.rest}" data-field="rest" class="ex-field px-3 py-2 rounded-lg text-sm"/>
+        </div>
+        <input type="text" placeholder="Observações (opcional)" value="${ex.notes || ''}" data-field="notes" class="ex-field w-full px-3 py-2 rounded-lg text-sm"/>
+      </div>
+    </div>
+  `;
+}
+
+// ============ EVENTS ============
+function attachEvents() {
+  // Auth Tabs
+  document.querySelectorAll('[data-auth-tab]').forEach(btn => {
+    btn.onclick = () => {
+      state.authTab = btn.dataset.authTab;
+      render();
+    };
+  });
+
+  // Login
+  const btnLogin = document.getElementById('btn-login');
+  if (btnLogin) {
+    btnLogin.onclick = () => {
+      const email = document.getElementById('login-email').value.trim().toLowerCase();
+      const user = state.data.users.find(u => u.email.toLowerCase() === email);
+      if (user) {
+        state.user = user;
+        state.currentView = 'dashboard';
+        state.activeTab = 'home';
+        state.showUserMenu = false;
+        saveUser();
+        showToast(`Bem-vindo, ${user.name.split(' ')[0]}!`);
+        render();
+      } else {
+        showToast('Usuário não encontrado. Crie uma conta ou use o acesso rápido.', 'error');
+      }
+    };
+  }
+
+  // Register
+  const btnReg = document.getElementById('btn-register');
+  if (btnReg) {
+    btnReg.onclick = () => {
+      const name = document.getElementById('reg-name').value.trim();
+      const email = document.getElementById('reg-email').value.trim().toLowerCase();
+      const role = document.getElementById('reg-role').value;
+      if (!name || !email) {
+        showToast('Preencha nome e e-mail.', 'error');
+        return;
+      }
+      if (state.data.users.some(u => u.email.toLowerCase() === email)) {
+        showToast('Este e-mail já está cadastrado.', 'error');
+        return;
+      }
+      const newUser = {
+        id: 'u' + Date.now(),
+        tenant_id: 't1',
+        role,
+        name,
+        phone: '+5511999990000',
+        email,
+        access_status: 'ACTIVE'
+      };
+      state.data.users.push(newUser);
+      if (role === 'STUDENT') {
+        state.data.subscriptions.push({
+          id: 's' + Date.now(),
+          tenant_id: 't1',
+          user_id: newUser.id,
+          status: 'active',
+          due_date: '2026-12-23',
+          amount: 99.90
+        });
+      }
+      saveData();
+      state.user = newUser;
+      state.currentView = 'dashboard';
+      state.activeTab = 'home';
+      saveUser();
+      showToast('Conta criada com sucesso!');
+      render();
+    };
+  }
+
+  // Quick login
+  document.querySelectorAll('.quick-login').forEach(btn => {
+    btn.onclick = () => {
+      const role = btn.dataset.role;
+      const user = state.data.users.find(u => u.role === role);
+      if (user) {
+        state.user = user;
+        state.currentView = 'dashboard';
+        state.activeTab = 'home';
+        state.showUserMenu = false;
+        saveUser();
+        showToast(`Entrou como ${user.name}`);
+        render();
+      }
+    };
+  });
+
+  // Bell notifications
+  const btnBell = document.getElementById('btn-bell');
+  if (btnBell) {
+    btnBell.onclick = () => {
+      const overdue = state.data.subscriptions.filter(s => s.status === 'overdue').length;
+      showToast(overdue > 0 ? `${overdue} aluno(s) com mensalidade pendente.` : 'Nenhuma pendência no momento.', 'info');
+    };
+  }
+
+  // Avatar / User Menu
+  const btnAvatar = document.getElementById('btn-avatar');
+  if (btnAvatar) {
+    btnAvatar.onclick = (e) => {
+      e.stopPropagation();
+      state.showUserMenu = !state.showUserMenu;
+      render();
+    };
+  }
+
+  const menuOverlay = document.getElementById('menu-overlay');
+  if (menuOverlay) {
+    menuOverlay.onclick = () => {
+      state.showUserMenu = false;
+      render();
+    };
+  }
+
+  // Menu: Profile
+  const menuProfile = document.getElementById('menu-profile');
+  if (menuProfile) {
+    menuProfile.onclick = () => {
+      state.showUserMenu = false;
+      state.modal = { type: 'profile' };
+      render();
+    };
+  }
+
+  // Menu: Switch Account
+  const menuSwitch = document.getElementById('menu-switch-account');
+  if (menuSwitch) {
+    menuSwitch.onclick = () => {
+      state.showUserMenu = false;
+      state.user = null;
+      state.currentView = 'login';
+      state.activeTab = 'home';
+      state.editingWorkout = null;
+      saveUser();
+      render();
+    };
+  }
+
+  // Menu: Logout
+  const menuLogout = document.getElementById('menu-logout');
+  if (menuLogout) {
+    menuLogout.onclick = () => {
+      state.showUserMenu = false;
+      state.modal = { type: 'confirm-logout' };
+      render();
+    };
+  }
+
+  // Modal controls
+  const closeModal = () => { state.modal = null; render(); };
+  const elClose1 = document.getElementById('close-modal');
+  const elClose2 = document.getElementById('close-modal-btn');
+  const elBackdrop = document.getElementById('modal-backdrop');
+  if (elClose1) elClose1.onclick = closeModal;
+  if (elClose2) elClose2.onclick = closeModal;
+  if (elBackdrop) elBackdrop.onclick = closeModal;
+
+  const confirmLogoutBtn = document.getElementById('confirm-logout-btn');
+  if (confirmLogoutBtn) {
+    confirmLogoutBtn.onclick = () => {
+      state.modal = null;
+      state.user = null;
+      state.currentView = 'login';
+      state.activeTab = 'home';
+      state.editingWorkout = null;
+      saveUser();
+      showToast('Sessão encerrada.', 'info');
+      render();
+    };
+  }
+
+  // Add Student Modal
+  const btnOpenAddStudent = document.getElementById('btn-open-add-student');
+  if (btnOpenAddStudent) {
+    btnOpenAddStudent.onclick = () => {
+      state.modal = { type: 'add-student' };
+      render();
+    };
+  }
+
+  const btnSaveNewStudent = document.getElementById('save-new-student');
+  if (btnSaveNewStudent) {
+    btnSaveNewStudent.onclick = () => {
+      const name = document.getElementById('new-st-name').value.trim();
+      const email = document.getElementById('new-st-email').value.trim();
+      const phone = document.getElementById('new-st-phone').value.trim() || '+5511999990000';
+      const amount = parseFloat(document.getElementById('new-st-amount').value) || 99.90;
+      if (!name || !email) {
+        showToast('Preencha nome e e-mail do aluno.', 'error');
+        return;
+      }
+      const id = 'u' + Date.now();
+      state.data.users.push({
+        id, tenant_id: 't1', role: 'STUDENT', name, phone, email, access_status: 'ACTIVE'
+      });
+      state.data.subscriptions.push({
+        id: 's' + Date.now(), tenant_id: 't1', user_id: id, status: 'active', due_date: '2026-12-23', amount
+      });
+      saveData();
+      state.modal = null;
+      showToast(`Aluno ${name} cadastrado!`);
+      render();
+    };
+  }
+
+  // Student search & filter
+  const searchInput = document.getElementById('student-search-input');
+  if (searchInput) {
+    searchInput.oninput = (e) => {
+      state.studentSearch = e.target.value;
+      const pos = e.target.selectionStart;
+      render();
+      const el = document.getElementById('student-search-input');
+      if (el) { el.focus(); el.setSelectionRange(pos, pos); }
+    };
+  }
+
+  document.querySelectorAll('[data-st-filter]').forEach(btn => {
+    btn.onclick = () => {
+      state.studentFilter = btn.dataset.stFilter;
+      render();
+    };
+  });
+
+  // Toggle student status (Active/Blocked)
+  document.querySelectorAll('[data-toggle-status]').forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.dataset.toggleStatus;
+      const st = state.data.users.find(u => u.id === id);
+      const sub = state.data.subscriptions.find(s => s.user_id === id);
+      if (st) {
+        const nextActive = st.access_status !== 'ACTIVE';
+        st.access_status = nextActive ? 'ACTIVE' : 'BLOCKED';
+        if (sub) sub.status = nextActive ? 'active' : 'overdue';
+        saveData();
+        showToast(`${st.name}: acesso ${nextActive ? 'LIBERADO' : 'BLOQUEADO'}`, nextActive ? 'success' : 'error');
+        render();
+      }
+    };
+  });
+
+  // Turnstile Simulator
+  const btnSimGate = document.getElementById('btn-sim-gate');
+  if (btnSimGate) {
+    btnSimGate.onclick = () => {
+      const userId = document.getElementById('sim-student-select').value;
+      const st = state.data.users.find(u => u.id === userId);
+      if (!st) return;
+      const granted = st.access_status === 'ACTIVE';
+      state.data.access_logs.push({
+        id: 'a' + Date.now(),
+        tenant_id: 't1',
+        user_id: userId,
+        method: 'QR',
+        status: granted ? 'GRANTED' : 'DENIED',
+        timestamp: new Date().toISOString()
+      });
+      saveData();
+      showToast(granted ? `Catraca liberada para ${st.name}!` : `Acesso negado para ${st.name}!`, granted ? 'success' : 'error');
+      render();
+    };
+  }
+
+  // Student Regularize payment
+  const btnRegularize = document.getElementById('btn-regularize');
+  if (btnRegularize) {
+    btnRegularize.onclick = () => {
+      const u = state.data.users.find(x => x.id === state.user.id);
+      const sub = state.data.subscriptions.find(s => s.user_id === state.user.id);
+      if (u) u.access_status = 'ACTIVE';
+      if (sub) { sub.status = 'active'; sub.due_date = '2026-12-23'; }
+      state.user.access_status = 'ACTIVE';
+      saveData();
+      saveUser();
+      showToast('Pagamento confirmado! Catraca liberada.');
+      render();
+    };
+  }
+
+  // Refresh QR
+  const btnRefreshQR = document.getElementById('btn-refresh-qr');
+  if (btnRefreshQR) {
+    btnRefreshQR.onclick = () => {
+      state.qrSeed = Date.now();
+      showToast('Novo token QR gerado!', 'info');
+      render();
+    };
+  }
+
+  // Install PWA
+  const btnInstallPWA = document.getElementById('btn-install-pwa');
+  if (btnInstallPWA && state.deferredInstallPrompt) {
+    btnInstallPWA.onclick = async () => {
+      state.deferredInstallPrompt.prompt();
+      const { outcome } = await state.deferredInstallPrompt.userChoice;
+      if (outcome === 'accepted') state.deferredInstallPrompt = null;
+      render();
+    };
+  }
+
+  // Reset Demo
+  const btnResetDemo = document.getElementById('btn-reset-demo');
+  if (btnResetDemo) {
+    btnResetDemo.onclick = () => {
+      localStorage.removeItem('academiaflow_v2_data');
+      state.data = JSON.parse(JSON.stringify(DEFAULT_DATA));
+      showToast('Dados da demonstração restaurados!', 'info');
+      render();
+    };
+  }
+
+  // Tabs
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.onclick = () => {
+      const tab = btn.dataset.tab;
+      if (tab) {
+        state.activeTab = tab;
+        state.showUserMenu = false;
+        render();
+      }
+    };
+  });
+
+  // Student cards (Trainer)
+  document.querySelectorAll('.student-card').forEach(btn => {
+    btn.onclick = () => {
+      const studentId = btn.dataset.student;
+      const workout = state.data.workouts.find(w => w.student_id === studentId);
+      state.editingWorkout = workout ? { ...workout, exercises_json: workout.exercises_json.map(e => ({...e})) } : { student_id: studentId, title: '', exercises_json: [] };
+      state.currentView = 'workout';
+      render();
+    };
+  });
+
+  // New workout
+  document.querySelectorAll('[data-action="new-workout"]').forEach(btn => {
+    btn.onclick = () => {
+      state.editingWorkout = { title: '', exercises_json: [] };
+      state.currentView = 'workout';
+      render();
+    };
+  });
+
+  // Edit workout
+  document.querySelectorAll('[data-edit-workout]').forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.dataset.editWorkout;
+      const w = state.data.workouts.find(w => w.id === id);
+      state.editingWorkout = { ...w, exercises_json: w.exercises_json.map(e => ({...e})) };
+      state.currentView = 'workout';
+      render();
+    };
+  });
+
+  // Delete workout
+  document.querySelectorAll('[data-delete-workout]').forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.dataset.deleteWorkout;
+      state.data.workouts = state.data.workouts.filter(w => w.id !== id);
+      saveData();
+      showToast('Ficha removida.', 'info');
+      render();
+    };
+  });
+
+  // Back
+  const btnBack = document.getElementById('btn-back');
+  if (btnBack) {
+    btnBack.onclick = () => {
+      state.currentView = 'dashboard';
+      state.editingWorkout = null;
+      render();
+    };
+  }
+
+  // Add exercise
+  const btnAddEx = document.getElementById('btn-add-exercise');
+  if (btnAddEx) {
+    btnAddEx.onclick = () => {
+      state.editingWorkout.exercises_json.push({ name: '', sets: 3, reps: '10-12', load: '', rest: '60s', notes: '' });
+      render();
+    };
+  }
+
+  // Remove exercise
+  document.querySelectorAll('[data-remove-exercise]').forEach(btn => {
+    btn.onclick = () => {
+      const idx = parseInt(btn.dataset.removeExercise);
+      state.editingWorkout.exercises_json.splice(idx, 1);
+      render();
+    };
+  });
+
+  // Exercise fields
+  document.querySelectorAll('.ex-field').forEach(input => {
+    input.oninput = () => {
+      const card = input.closest('[data-exercise-idx]');
+      if (!card) return;
+      const idx = parseInt(card.dataset.exerciseIdx);
+      const field = input.dataset.field;
+      state.editingWorkout.exercises_json[idx][field] = field === 'sets' ? (parseInt(input.value) || 0) : input.value;
+    };
+  });
+
+  // Save workout
+  const btnSave = document.getElementById('btn-save-workout');
+  if (btnSave) {
+    btnSave.onclick = () => {
+      const studentId = document.getElementById('f-student').value;
+      const title = document.getElementById('f-title').value.trim();
+      if (!studentId || !title) {
+        showToast('Preencha aluno e título da ficha.', 'error');
+        return;
+      }
+      if (state.editingWorkout.exercises_json.length === 0) {
+        showToast('Adicione pelo menos um exercício.', 'error');
+        return;
+      }
+
+      if (state.editingWorkout.id) {
+        const idx = state.data.workouts.findIndex(w => w.id === state.editingWorkout.id);
+        state.data.workouts[idx] = {
+          ...state.editingWorkout,
+          student_id: studentId,
+          title: title,
+          updated_at: new Date().toISOString().split('T')[0]
+        };
+      } else {
+        state.data.workouts.push({
+          id: 'w' + Date.now(),
+          tenant_id: 't1',
+          student_id: studentId,
+          trainer_id: state.user.id,
+          title: title,
+          exercises_json: state.editingWorkout.exercises_json,
+          updated_at: new Date().toISOString().split('T')[0]
+        });
+      }
+      saveData();
+      state.currentView = 'dashboard';
+      state.activeTab = 'workouts';
+      state.editingWorkout = null;
+      showToast('Ficha de treino salva!');
+      render();
+    };
+  }
+
+  // Start workout
+  const btnStart = document.getElementById('btn-start-workout');
+  if (btnStart) {
+    btnStart.onclick = () => {
+      state.currentView = 'workout-mode';
+      render();
+      startWorkoutTimer();
+      requestWakeLock();
+    };
+  }
+
+  // Exit workout mode
+  const btnExit = document.getElementById('btn-exit-mode');
+  if (btnExit) {
+    btnExit.onclick = () => {
+      state.currentView = 'dashboard';
+      state.activeTab = 'workout';
+      stopWorkoutTimer();
+      stopRestTimer();
+      releaseWakeLock();
+      render();
+    };
+  }
+
+  // Finish workout
+  const btnFinish = document.getElementById('btn-finish-workout');
+  if (btnFinish) {
+    btnFinish.onclick = () => {
+      const workout = state.data.workouts.find(w => w.student_id === state.user.id) || state.data.workouts[0];
+      if (workout) {
+        workout.exercises_json.forEach((_, idx) => {
+          delete state.data.completed_sets[`${workout.id}_${idx}`];
+        });
+      }
+      state.data.workout_history[state.user.id] = (state.data.workout_history[state.user.id] || 12) + 1;
+      saveData();
+      state.currentView = 'dashboard';
+      state.activeTab = 'home';
+      stopWorkoutTimer();
+      stopRestTimer();
+      releaseWakeLock();
+      showToast('Treino registrado no seu histórico! 🏆');
+      render();
+    };
+  }
+
+  // Rest timer controls
+  const btnSkipRest = document.getElementById('btn-skip-rest');
+  if (btnSkipRest) btnSkipRest.onclick = () => { stopRestTimer(); render(); };
+  const btnAddRest = document.getElementById('btn-add-rest');
+  if (btnAddRest) btnAddRest.onclick = () => { state.restTimer.seconds += 15; render(); };
+
+  // Set buttons
+  document.querySelectorAll('.set-btn').forEach(btn => {
+    btn.onclick = () => {
+      const key = btn.dataset.set;
+      const restSec = parseInt(btn.dataset.rest) || 60;
+      const parts = key.split('_');
+      const wId = parts[0];
+      const exIdx = parseInt(parts[1]);
+      const sIdx = parseInt(parts[2]);
+
+      const workout = state.data.workouts.find(w => w.id === wId);
+      if (!workout) return;
+
+      const currentKey = `${wId}_${exIdx}`;
+      const current = state.data.completed_sets[currentKey] || 0;
+
+      if (sIdx === current) {
+        state.data.completed_sets[currentKey] = current + 1;
+        if (navigator.vibrate) navigator.vibrate(30);
+        if (state.currentView === 'workout-mode') startRestTimer(restSec);
+      } else if (sIdx < current) {
+        state.data.completed_sets[currentKey] = sIdx;
+      }
+
+      saveData();
+      render();
+      if (state.currentView === 'workout-mode') startWorkoutTimer();
+    };
+  });
+
+  // QR Timer
+  if (state.activeTab === 'qr' && state.user && state.user.role === 'STUDENT') {
+    startQRTimer();
+  }
+}
+
+// Close menu on outside click
+document.addEventListener('click', (e) => {
+  if (state.showUserMenu) {
+    const menu = document.getElementById('user-menu');
+    const avatar = document.getElementById('btn-avatar');
+    if (menu && !menu.contains(e.target) && (!avatar || !avatar.contains(e.target))) {
+      state.showUserMenu = false;
+      render();
+    }
+  }
+});
+
+// ============ TIMERS ============
+let workoutTimerInterval = null;
+let workoutStartTime = null;
+
+function startWorkoutTimer() {
+  if (workoutTimerInterval) clearInterval(workoutTimerInterval);
+  if (!workoutStartTime) workoutStartTime = Date.now();
+
+  workoutTimerInterval = setInterval(() => {
+    const elapsed = Math.floor((Date.now() - workoutStartTime) / 1000);
+    const mins = Math.floor(elapsed / 60).toString().padStart(2, '0');
+    const secs = (elapsed % 60).toString().padStart(2, '0');
+    const timerEl = document.getElementById('timer');
+    if (timerEl) timerEl.textContent = `${mins}:${secs}`;
+  }, 1000);
+}
+
+function stopWorkoutTimer() {
+  if (workoutTimerInterval) {
+    clearInterval(workoutTimerInterval);
+    workoutTimerInterval = null;
+  }
+  workoutStartTime = null;
+}
+
+let restTimerInterval = null;
+function startRestTimer(seconds) {
+  stopRestTimer();
+  state.restTimer = { active: true, seconds, total: seconds };
+  restTimerInterval = setInterval(() => {
+    state.restTimer.seconds--;
+    const el = document.getElementById('rest-timer-val');
+    if (el) el.textContent = `${state.restTimer.seconds}s`;
+    if (state.restTimer.seconds <= 0) {
+      stopRestTimer();
+      if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+      showToast('Descanso finalizado! Próxima série 💪', 'info');
+      render();
+    }
+  }, 1000);
+}
+
+function stopRestTimer() {
+  if (restTimerInterval) {
+    clearInterval(restTimerInterval);
+    restTimerInterval = null;
+  }
+  state.restTimer.active = false;
+}
+
+let qrTimerInterval = null;
+function startQRTimer() {
+  if (qrTimerInterval) clearInterval(qrTimerInterval);
+  let seconds = 60;
+  const update = () => {
+    const el = document.getElementById('qr-timer');
+    if (!el) { clearInterval(qrTimerInterval); qrTimerInterval = null; return; }
+    const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+    const secs = (seconds % 60).toString().padStart(2, '0');
+    el.textContent = `${mins}:${secs}`;
+    seconds--;
+    if (seconds < 0) {
+      seconds = 60;
+      state.qrSeed = Date.now();
+      render();
+    }
+  };
+  update();
+  qrTimerInterval = setInterval(update, 1000);
+}
+
+// ============ WAKE LOCK & PWA ============
+let wakeLock = null;
+async function requestWakeLock() {
+  try {
+    if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen');
+  } catch (e) {}
+}
+async function releaseWakeLock() {
+  if (wakeLock) {
+    try { await wakeLock.release(); } catch(e) {}
+    wakeLock = null;
+  }
+}
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  state.deferredInstallPrompt = e;
+});
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
+
+// ============ INIT ============
+render();
+
+document.addEventListener('visibilitychange', () => {
+  if (state.currentView === 'workout-mode' && document.visibilityState === 'visible') {
+    requestWakeLock();
+  }
+});
+</script>
+</body>
+</html>
